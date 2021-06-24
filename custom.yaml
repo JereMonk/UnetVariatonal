@@ -1,0 +1,31 @@
+JSON_PATHS_TRAIN: ["/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_0.json","/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_1.json"]
+JSON_PATHS_TEST: ["/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_3.json","/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_4.json"]
+
+TRAIN_DATASET: ["/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_0.json","/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_1.json"]
+TEST_DATASET: ["/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_3.json","/shared/perso/nicolas/Projets/Classifieur_idea/idea_data_train/door_batch_4.json"]
+
+
+SUBCATS: ["bumper_back","bumper_front","door_back_left","door_back_right","door_front_left","door_front_right","fender_back_left","fender_back_right","fender_front_left","fender_front_right"] 
+SOLVER:
+  STEPS: [1000, 10000]
+  MAX_ITER: 50000
+  IMS_PER_BATCH: 10
+  BASE_LR: 0.0001
+  DECAY_STEP: 10000
+  DECAY_RATE: 0.5
+
+CHECKPOINT_PERIOD: 100
+IMG_PERIOD: 3000
+TEST_PERIOD: 100000000
+INPUT:
+  DIM: 128
+  BLUR_KERNEL: 6
+  NOISE_AMP: 0.1
+  SIGMA: 4
+MODEL:
+  K: 10
+  STAGES: 4
+  FILTERS: 64
+RECONSTRUCTION_LOSS_WEIGHT: 65000
+
+USE_DROPOUT: 1
