@@ -9,8 +9,8 @@ SUBCATS: ["bumper_back","bumper_front","door_back_left","door_back_right","door_
 SOLVER:
   STEPS: [1000, 10000]
   MAX_ITER: 50000
-  IMS_PER_BATCH: 10
-  BASE_LR: 0.0001
+  IMS_PER_BATCH: 100
+  BASE_LR: 0.0000001
   DECAY_STEP: 10000
   DECAY_RATE: 0.5
 

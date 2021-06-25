@@ -51,6 +51,7 @@ class Encoder(tf.keras.Model):
         self.ReLU5 = tf.keras.layers.ReLU()
         
         self.flatten=tf.keras.layers.Flatten()
+        self.dense2= tf.keras.layers.Dense(units=1024)
         self.mu = tf.keras.layers.Dense(units=1024)
         self.sigma = tf.keras.layers.Dense(units=1024)
 
@@ -84,7 +85,8 @@ class Encoder(tf.keras.Model):
       x5=self.ReLU5(x5)
 
       x6 = self.flatten(x5)
-
+      x6 = self.dense2(x6)
+      
       mean = self.mu(x6)
       var = self.sigma(x6)
       sampled = self.sampler((mean,var))
@@ -150,7 +152,7 @@ class Decoder(tf.keras.Model):
 
       x5= self.upsample5(x4)
       x5= self.BN5(x5)
-      x5=self.ReLU5(x5)
+      #x5=self.ReLU5(x5)
 
 
 
@@ -161,10 +163,11 @@ class Decoder(tf.keras.Model):
 
       
 class VariatonalAutoEncoder(tf.keras.Model):
-  def __init__(self,encoder,decoder):
+  def __init__(self,encoder,decoder,Nt):
     super(VariatonalAutoEncoder, self).__init__()
     self.encoder=encoder
     self.decoder=decoder
+    self.Nt= Nt
 
   def call(self,x):
     mean,var,sampled = self.encoder(x)
@@ -184,7 +187,7 @@ class VariatonalAutoEncoder(tf.keras.Model):
     
 
   @tf.function
-  def train_step(self,batch_data):
+  def train_step(self,batch_data,step):
 
     with tf.GradientTape() as tape:
 
@@ -194,7 +197,17 @@ class VariatonalAutoEncoder(tf.keras.Model):
 
       kl_loss = -0.5 * (1 + var - tf.square(mean) - tf.exp(var))
       kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
-      total_loss = loss_reco + kl_loss
+
+      
+      if(step>self.Nt):
+        #total_loss = loss_reco + kl_loss
+        real_kl = kl_loss
+      else:
+        #total_loss = loss_reco + kl_loss * (step/self.Nt)
+        #real_kl = kl_loss * (step/self.Nt)
+        real_kl = 0
+
+      total_loss = loss_reco + real_kl
       
       for layer in self.layers:
         total_loss+=tf.math.reduce_sum(layer.losses)
@@ -206,7 +219,7 @@ class VariatonalAutoEncoder(tf.keras.Model):
     )
 
     return({
-      "kl_loss":kl_loss,
+      "kl_loss":real_kl,
       "loss_reco":loss_reco,
       "total_loss":total_loss
     })

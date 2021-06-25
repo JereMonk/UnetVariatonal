@@ -66,6 +66,9 @@ class DataGenerator(tf.keras.utils.Sequence):
         else:
             im = PIL.Image.open(data["path"])
         
+        if np.random.random()<0.5:
+            im = im.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+            
         bbox =  data["part_bbox"]
         img_crop = im.crop(bbox)
         img_crop = img_crop.resize(self.dim)
@@ -105,7 +108,11 @@ class DataGenerator(tf.keras.utils.Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            X[i,] = self.load_image(self.indexes[ID])
+            img_ = self.load_image(self.indexes[ID])
+            if(len(img_.shape)==3):
+                X[i,] = img_
+            else:
+                X[i,] = tf.zeros(shape=(self.dim[0],self.dim[1],self.n_channels))
 
             # Store class
             #y[i] = self.labels[ID]
